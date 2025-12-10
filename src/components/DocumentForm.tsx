@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Download, Save, Trash2, FileText } from "lucide-react";
+import { Download, Trash2, FileText } from "lucide-react";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { saveAs } from "file-saver";
@@ -22,37 +22,19 @@ const DocumentForm = () => {
     textInput2: "",
     textInput3: "",
   });
-  const [isSaved, setIsSaved] = useState(false);
 
   const handleInputChange = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length <= MAX_LENGTH) {
       setFormData((prev) => ({ ...prev, [field]: value }));
-      setIsSaved(false);
     }
-  };
-
-  const handleSave = () => {
-    if (!formData.textInput1 && !formData.textInput2 && !formData.textInput3) {
-      toast({
-        title: "Uwaga",
-        description: "Wprowadź tekst w co najmniej jednym polu.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsSaved(true);
-    toast({
-      title: "Zapisano",
-      description: "Dane zostały zapisane pomyślnie.",
-    });
   };
 
   const handleDownload = async () => {
-    if (!isSaved) {
+    if (!formData.textInput1 && !formData.textInput2 && !formData.textInput3) {
       toast({
-        title: "Uwaga",
-        description: "Zapisz dane przed pobraniem dokumentu.",
+        title: "Warning",
+        description: "Please enter text in at least one field.",
         variant: "destructive",
       });
       return;
@@ -80,17 +62,17 @@ const DocumentForm = () => {
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       });
 
-      saveAs(out, "dokument.docx");
+      saveAs(out, "document.docx");
       
       toast({
-        title: "Pobrano",
-        description: "Dokument został pobrany pomyślnie.",
+        title: "Downloaded",
+        description: "Document has been downloaded successfully.",
       });
     } catch (error) {
       console.error("Error generating document:", error);
       toast({
-        title: "Błąd",
-        description: "Nie udało się wygenerować dokumentu.",
+        title: "Error",
+        description: "Failed to generate document.",
         variant: "destructive",
       });
     }
@@ -102,10 +84,9 @@ const DocumentForm = () => {
       textInput2: "",
       textInput3: "",
     });
-    setIsSaved(false);
     toast({
-      title: "Wyczyszczono",
-      description: "Formularz został wyczyszczony.",
+      title: "Cleared",
+      description: "Form has been cleared.",
     });
   };
 
@@ -117,21 +98,21 @@ const DocumentForm = () => {
             <FileText className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Generator dokumentów</h1>
-            <p className="text-sm text-muted-foreground">Wypełnij pola i pobierz dokument</p>
+            <h1 className="text-2xl font-bold text-foreground">Document Generator</h1>
+            <p className="text-sm text-muted-foreground">Fill in the fields and download your document</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="input1" className="text-sm font-medium">
-              Pole tekstowe 1
+              Text Field 1
             </Label>
             <Input
               id="input1"
               value={formData.textInput1}
               onChange={handleInputChange("textInput1")}
-              placeholder="Wprowadź tekst..."
+              placeholder="Enter text..."
               maxLength={MAX_LENGTH}
             />
             <p className="text-xs text-muted-foreground text-right">
@@ -141,13 +122,13 @@ const DocumentForm = () => {
 
           <div className="space-y-2">
             <Label htmlFor="input2" className="text-sm font-medium">
-              Pole tekstowe 2
+              Text Field 2
             </Label>
             <Input
               id="input2"
               value={formData.textInput2}
               onChange={handleInputChange("textInput2")}
-              placeholder="Wprowadź tekst..."
+              placeholder="Enter text..."
               maxLength={MAX_LENGTH}
             />
             <p className="text-xs text-muted-foreground text-right">
@@ -157,13 +138,13 @@ const DocumentForm = () => {
 
           <div className="space-y-2">
             <Label htmlFor="input3" className="text-sm font-medium">
-              Pole tekstowe 3
+              Text Field 3
             </Label>
             <Input
               id="input3"
               value={formData.textInput3}
               onChange={handleInputChange("textInput3")}
-              placeholder="Wprowadź tekst..."
+              placeholder="Enter text..."
               maxLength={MAX_LENGTH}
             />
             <p className="text-xs text-muted-foreground text-right">
@@ -171,20 +152,12 @@ const DocumentForm = () => {
             </p>
           </div>
 
-          <div className="pt-4 border-t border-border">
-            <Button onClick={handleSave} className="w-full" size="lg">
-              <Save className="w-4 h-4" />
-              SAVE
-            </Button>
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-4 border-t border-border">
             <Button
               onClick={handleDownload}
               variant="success"
               className="flex-1"
               size="lg"
-              disabled={!isSaved}
             >
               <Download className="w-4 h-4" />
               DOWNLOAD
@@ -200,14 +173,6 @@ const DocumentForm = () => {
             </Button>
           </div>
         </div>
-
-        {isSaved && (
-          <div className="mt-6 p-4 bg-accent rounded-xl border border-primary/20 animate-fade-in">
-            <p className="text-sm text-accent-foreground font-medium">
-              ✓ Dane zapisane - możesz pobrać dokument
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
